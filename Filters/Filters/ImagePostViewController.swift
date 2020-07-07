@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  ImagePostViewController.swift
 //  Filters
 //
 //  Created by Stephanie Ballard on 7/6/20.
@@ -16,10 +16,30 @@ import CoreImage.CIFilterBuiltins
  3. Build out the UI to match the attributes with the correct min/max values
  */
 
-class ViewController: UIViewController {
+class ImagePostViewController: UIViewController {
 
     private let context = CIContext(options: nil)
     
+    private var originalImage: UIImage? {
+        didSet {
+            // 414 * 3 = 1,242 pixels (portrait on iPhone 11 Pro Max)
+            guard let originalImage = originalImage else {
+                scaledImage = nil // clear out image if set to nil
+                return
+            }
+            
+            var scaledSize = imageView.bounds.size
+            let scale = UIScreen.main.scale
+            scaledSize = CGSize(width: scaledSize.width * scale, height: scaledSize.height * scale)
+            scaledImage = originalImage.imageByScaling(toSize: scaledSize)
+        }
+    }
+    
+    private var scaledImage: UIImage? {
+        didSet {
+            updateImage()
+        }
+    }
     @IBOutlet weak var imageView: UIImageView!
     
     override func viewDidLoad() {
@@ -132,6 +152,14 @@ class ViewController: UIViewController {
         guard let outputCGImage = context.createCGImage(outputCIImage, from: CGRect(origin: .zero, size: image.size)) else { return nil }
         
         return UIImage(cgImage: outputCGImage)
+    }
+    
+    private func updateImage() {
+//        if let scaledImage = scaledImage {
+//            imageView.image = filterImage(scaledImage)
+//        } else {
+//            imageView.image = nil
+//        }
     }
 }
 
